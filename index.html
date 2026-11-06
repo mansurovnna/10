@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Удобная система управления библиотечным каталогом и читателями."
+    />
+    <title>Читальня — управление библиотекой</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Основная навигация">
+        <a class="brand" href="#" aria-label="Читальня — на главную">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M5 7.5c4.3-1.6 8-.8 11 1.4v17c-3-2.2-6.7-3-11-1.4v-17Z" />
+              <path d="M27 7.5c-4.3-1.6-8-.8-11 1.4v17c3-2.2 6.7-3 11-1.4v-17Z" />
+              <path d="M9 12c2-.5 3.6-.3 5 .4M9 16c2-.5 3.6-.3 5 .4m9-4.4c-2-.5-3.6-.3-5 .4m5 3.6c-2-.5-3.6-.3-5 .4" />
+            </svg>
+          </span>
+          <span class="brand-copy">
+            <strong>читальня</strong>
+            <span>библиотека рядом</span>
+          </span>
+        </a>
+
+        <div class="sidebar-label">МЕНЮ</div>
+        <nav class="nav-list">
+          <a class="nav-link active" href="#overview" data-nav="overview">
+            <span class="nav-icon" aria-hidden="true">⌂</span>
+            <span>Обзор</span>
+          </a>
+          <a class="nav-link" href="#catalog" data-nav="catalog">
+            <span class="nav-icon book-nav" aria-hidden="true">▤</span>
+            <span>Каталог книг</span>
+            <span class="nav-count" id="navBookCount">0</span>
+          </a>
+          <a class="nav-link" href="#readers" data-nav="readers">
+            <span class="nav-icon" aria-hidden="true">♙</span>
+            <span>Читатели</span>
+          </a>
+          <a class="nav-link" href="#loans" data-nav="loans">
+            <span class="nav-icon" aria-hidden="true">↗</span>
+            <span>Выданные книги</span>
+            <span class="nav-count warm" id="navLoanCount">0</span>
+          </a>
+          <button class="nav-link admin-nav-link" type="button" data-admin-panel>
+            <span class="nav-icon" aria-hidden="true">⚙</span>
+            <span>Панель администратора</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="sidebar-note">
+            <span class="note-sparkle" aria-hidden="true">✦</span>
+            <p>Хорошая книга — это путешествие, которое всегда под рукой.</p>
+            <span>Читальня · с заботой о книгах</span>
+          </div>
+          <button class="profile-button" type="button" data-admin-panel aria-label="Открыть панель администратора">
+            <span class="avatar librarian-avatar">А</span>
+            <span class="profile-copy"><strong id="adminUsername">Администратор</strong><small>Администратор</small></span>
+            <span class="profile-more" aria-hidden="true">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content" id="overview">
+        <header class="topbar">
+          <div class="breadcrumbs"><span>Библиотека</span><span class="crumb-dot">/</span><strong>Обзор</strong></div>
+          <div class="topbar-actions">
+            <span class="today-label" id="todayLabel"></span>
+            <span class="open-status"><i></i> Библиотека открыта</span>
+            <button class="admin-top-button" type="button" data-admin-panel>⚙ <span>Админ-панель</span></button>
+            <button class="icon-button mobile-menu" type="button" aria-label="Открыть меню" id="mobileMenuButton">☰</button>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="welcome-row">
+            <div>
+              <p class="eyebrow">ВАША БИБЛИОТЕКА СЕГОДНЯ</p>
+              <h1>Добро пожаловать, <span id="welcomeUsername">администратор</span> <span aria-hidden="true">✦</span></h1>
+              <p class="welcome-subtitle">Все книги и читатели — в одном уютном месте.</p>
+            </div>
+            <button class="button button-primary" type="button" data-open-modal="book">
+              <span class="plus">+</span> Добавить книгу
+            </button>
+          </section>
+
+          <section class="stats-grid" aria-label="Статистика библиотеки">
+            <article class="stat-card stat-total">
+              <div class="stat-top"><span>Всего книг</span><span class="stat-icon icon-lilac">▤</span></div>
+              <div class="stat-value" id="totalBooks">0</div>
+              <div class="stat-caption"><span class="tiny-dot lilac-dot"></span> В каталоге библиотеки</div>
+              <div class="stat-decoration book-decoration" aria-hidden="true">▤</div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span>Доступны</span><span class="stat-icon icon-green">✓</span></div>
+              <div class="stat-value" id="availableBooks">0</div>
+              <div class="stat-caption"><span class="tiny-dot green-dot"></span> Можно взять почитать</div>
+              <div class="availability-bar"><span id="availabilityBar"></span></div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span>На руках</span><span class="stat-icon icon-orange">↗</span></div>
+              <div class="stat-value" id="loanedBooks">0</div>
+              <div class="stat-caption"><span class="tiny-dot orange-dot"></span> Сейчас у читателей</div>
+              <div class="loan-avatars" id="loanAvatars" aria-hidden="true"></div>
+            </article>
+            <article class="stat-card">
+              <div class="stat-top"><span>Читатели</span><span class="stat-icon icon-blue">♙</span></div>
+              <div class="stat-value" id="readerCount">0</div>
+              <div class="stat-caption"><span class="tiny-dot blue-dot"></span> Зарегистрировано</div>
+              <div class="reader-sparkline" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+            </article>
+          </section>
+
+          <section class="content-grid">
+            <div class="panel catalog-panel" id="catalog">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow">КНИЖНАЯ ПОЛКА</p>
+                  <h2>Каталог книг <span class="heading-count" id="catalogCount">0</span></h2>
+                </div>
+                <button class="text-button" type="button" id="showAllBooks">Смотреть все <span>→</span></button>
+              </div>
+
+              <div class="catalog-toolbar">
+                <label class="search-box">
+                  <span aria-hidden="true">⌕</span>
+                  <input id="bookSearch" type="search" placeholder="Найти книгу или автора..." autocomplete="off" />
+                  <kbd>⌘ K</kbd>
+                </label>
+                <label class="select-wrap">
+                  <span class="sr-only">Фильтр книг</span>
+                  <select id="bookFilter">
+                    <option value="all">Все книги</option>
+                    <option value="available">Доступные</option>
+                    <option value="borrowed">На руках</option>
+                  </select>
+                </label>
+                <button class="sort-button" type="button" id="sortBooks" title="Сортировать по году издания">Год <span>↕</span></button>
+              </div>
+
+              <div class="book-list" id="bookList" aria-live="polite"></div>
+              <div class="empty-state hidden" id="emptyBooks">
+                <span>⌕</span>
+                <strong>Ничего не нашлось</strong>
+                <p>Попробуйте изменить запрос или фильтр.</p>
+              </div>
+            </div>
+
+            <aside class="right-column">
+              <section class="panel readers-panel" id="readers">
+                <div class="panel-heading compact-heading">
+                  <div><p class="eyebrow">НАШЕ СООБЩЕСТВО</p><h2>Читатели</h2></div>
+                  <div class="reader-heading-actions">
+                    <button class="text-button" type="button" id="showAllReaders">Все <span>→</span></button>
+                    <button class="round-add" type="button" data-open-modal="reader" aria-label="Добавить читателя">+</button>
+                  </div>
+                </div>
+                <div class="reader-list" id="readerList"></div>
+                <button class="readers-link" type="button" data-open-modal="reader">+ Добавить читателя</button>
+              </section>
+
+              <section class="quote-card">
+                <div class="quote-mark" aria-hidden="true">“</div>
+                <p>Чтение — это окно, через которое можно увидеть мир.</p>
+                <div class="quote-footer"><span></span><small>Сегодняшнее вдохновение</small></div>
+                <div class="quote-decoration" aria-hidden="true">✳</div>
+              </section>
+            </aside>
+          </section>
+
+          <section class="panel loans-panel" id="loans">
+            <div class="panel-heading loan-heading">
+              <div>
+                <p class="eyebrow">КНИГИ В ПУТИ</p>
+                <h2>Недавние выдачи <span class="heading-count" id="loansCount">0</span></h2>
+              </div>
+              <button class="text-button" type="button" id="showLoans">Все выдачи <span>→</span></button>
+            </div>
+            <div class="loan-table-wrap">
+              <table class="loan-table">
+                <thead><tr><th>КНИГА</th><th>ЧИТАТЕЛЬ</th><th>ВЫДАНА</th><th>ВЕРНУТЬ ДО</th><th>СТАТУС</th><th></th></tr></thead>
+                <tbody id="loanTableBody"></tbody>
+              </table>
+              <div class="empty-loans hidden" id="emptyLoans">Пока нет выданных книг — самое время найти себе чтение!</div>
+            </div>
+          </section>
+
+          <footer class="page-footer"><span>© <span id="yearNow"></span> Читальня</span><span>Создано с любовью к книгам <span class="footer-heart">♥</span></span></footer>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <dialog class="app-dialog" id="bookDialog">
+      <form class="dialog-form" id="bookForm">
+        <div class="dialog-top">
+          <div><p class="eyebrow">КАТАЛОГ БИБЛИОТЕКИ</p><h2 id="bookDialogTitle">Новая книга</h2></div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+        </div>
+        <p class="dialog-intro">Добавьте книгу на полку — и она станет доступна читателям.</p>
+        <input name="id" type="hidden" />
+        <label>Название книги<input name="title" required maxlength="100" placeholder="Например, Чистый код" /></label>
+        <label>Автор<input name="author" required maxlength="80" placeholder="Имя и фамилия автора" /></label>
+        <label>Год издания<input name="year" type="number" required min="1" max="2100" placeholder="2008" /></label>
+        <label>Жанр<input name="genre" maxlength="60" list="bookGenres" placeholder="Например, фантастика" /><datalist id="bookGenres"><option value="Художественная литература"></option><option value="Фантастика"></option><option value="Роман"></option><option value="Детектив"></option><option value="Научно-популярная литература"></option><option value="Психология"></option><option value="История"></option><option value="Программирование"></option><option value="Детская литература"></option><option value="Поэзия"></option></datalist></label>
+        <label>Описание книги<textarea name="description" rows="4" maxlength="2000" placeholder="Кратко расскажите, о чём эта книга..."></textarea></label>
+        <label class="cover-upload-label">Обложка книги <span class="optional">(PNG, JPG или WebP; до 1,5 МБ)</span><input name="coverFile" type="file" accept="image/png,image/jpeg,image/webp" /></label>
+        <div class="cover-preview-box hidden" id="coverPreviewBox"><img id="coverPreview" alt="Предварительный просмотр обложки" /><button class="cover-remove" type="button" id="removeCoverButton">Убрать обложку</button></div>
+        <div class="dialog-actions"><button class="button button-quiet" type="button" data-close-dialog>Отмена</button><button class="button button-primary" type="submit">Добавить книгу</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="readerDialog">
+      <form class="dialog-form" id="readerForm">
+        <div class="dialog-top">
+          <div><p class="eyebrow">НОВЫЙ ЧИТАТЕЛЬ</p><h2>Регистрация</h2></div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+        </div>
+        <p class="dialog-intro">Заполните данные, чтобы читатель мог брать книги домой.</p>
+        <div class="form-row"><label>Имя<input name="firstName" required maxlength="40" placeholder="Например, Алина" /></label><label>Фамилия <span class="optional">(необязательно)</span><input name="lastName" maxlength="40" placeholder="Садыкова" /></label></div>
+        <label>Номер телефона <span class="optional">(необязательно)</span><input name="phone" type="tel" maxlength="24" placeholder="+7 700 000 00 00" /></label>
+        <div class="dialog-actions"><button class="button button-quiet" type="button" data-close-dialog>Отмена</button><button class="button button-primary" type="submit">Зарегистрировать</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog" id="borrowDialog">
+      <form class="dialog-form" id="borrowForm">
+        <div class="dialog-top">
+          <div><p class="eyebrow">ОФОРМЛЕНИЕ ВЫДАЧИ</p><h2>Кому выдаём книгу?</h2></div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+        </div>
+        <div class="selected-book" id="selectedBook"></div>
+        <label>Читатель<select name="readerId" id="borrowReaderSelect" required></select></label>
+        <p class="field-hint">Срок выдачи — 14 дней. Если срок будет превышен, штраф составит 50 ₸ за каждый день.</p>
+        <div class="dialog-actions"><button class="button button-quiet" type="button" data-close-dialog>Отмена</button><button class="button button-primary" type="submit">Подтвердить выдачу</button></div>
+      </form>
+    </dialog>
+
+    <dialog class="app-dialog detail-dialog" id="detailDialog">
+      <div class="dialog-form">
+        <div class="dialog-top">
+          <div><p class="eyebrow">О КНИГЕ</p><h2 id="detailTitle">Информация о книге</h2></div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+        </div>
+        <div id="detailContent"></div>
+        <div class="dialog-actions" id="detailActions"></div>
+      </div>
+    </dialog>
+
+    <dialog class="app-dialog admin-dialog" id="adminDialog">
+      <div class="admin-panel">
+        <div class="dialog-top">
+          <div><p class="eyebrow">УПРАВЛЕНИЕ БИБЛИОТЕКОЙ</p><h2>Панель администратора</h2></div>
+          <button class="dialog-close" type="button" data-close-dialog aria-label="Закрыть">×</button>
+        </div>
+        <div class="admin-welcome"><span class="avatar librarian-avatar">А</span><span><strong id="panelUsername">Администратор</strong><small>Полный доступ к библиотеке</small></span><span class="database-status"><i></i> SQLite подключена</span></div>
+
+        <section class="admin-section">
+          <div class="admin-section-heading"><div><h3>Сводка системы</h3><p>Данные хранятся в локальной базе данных.</p></div><a class="button button-quiet backup-button" href="/api/admin/backup">↓ Скачать резервную копию</a></div>
+          <div class="admin-summary"><div><strong id="adminBooksTotal">0</strong><span>книг</span></div><div><strong id="adminReadersTotal">0</strong><span>читателей</span></div><div><strong id="adminLoansTotal">0</strong><span>выдач</span></div><div><strong id="databaseVersion">1</strong><span>версия данных</span></div></div>
+        </section>
+
+        <section class="admin-section">
+          <div class="admin-section-heading"><div><h3>Правила выдачи</h3><p>Новые настройки применяются к последующим выдачам.</p></div></div>
+          <form id="settingsForm" class="admin-inline-form">
+            <label>Срок возврата, дней<input name="loanDays" type="number" min="1" max="365" required /></label>
+            <label>Штраф за день, ₸<input name="finePerDay" type="number" min="0" max="1000000" required /></label>
+            <button class="button button-primary" type="submit">Сохранить</button>
+          </form>
+        </section>
+
+        <section class="admin-section">
+          <div class="admin-section-heading"><div><h3>Каталог и читатели</h3><p>Удаление книги или читателя невозможно, пока запись участвует в активной выдаче.</p></div></div>
+          <div class="admin-table-wrap"><table class="admin-table">          <thead><tr><th>КНИГА</th><th>ЖАНР</th><th>ГОД</th><th></th></tr></thead><tbody id="adminBookRows"></tbody></table></div>
+          <div class="admin-table-wrap admin-reader-table"><table class="admin-table"><thead><tr><th>ЧИТАТЕЛЬ</th><th>ТЕЛЕФОН</th><th>КНИГ НА РУКАХ</th><th></th></tr></thead><tbody id="adminReaderRows"></tbody></table></div>
+        </section>
+
+        <section class="admin-section password-section">
+          <div class="admin-section-heading"><div><h3>Безопасность</h3><p>Пароль хранится в виде защищённого хеша.</p></div></div>
+          <form id="passwordForm" class="password-form">
+            <label>Текущий пароль<input name="currentPassword" type="password" autocomplete="current-password" required /></label>
+            <label>Новый пароль<input name="newPassword" type="password" minlength="10" maxlength="256" autocomplete="new-password" required /></label>
+            <button class="button button-quiet" type="submit">Изменить пароль</button>
+          </form>
+        </section>
+        <div class="admin-footer"><span>База данных находится в папке проекта: <code>library.db</code></span><button class="logout-button" type="button" id="logoutButton">Выйти из аккаунта</button></div>
+      </div>
+    </dialog>
+
+    <div class="auth-screen" id="authScreen">
+      <section class="auth-card" aria-labelledby="authTitle">
+        <a class="brand auth-brand" href="#" aria-label="Читальня">
+          <span class="brand-mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M5 7.5c4.3-1.6 8-.8 11 1.4v17c-3-2.2-6.7-3-11-1.4v-17Z" /><path d="M27 7.5c-4.3-1.6-8-.8-11 1.4v17c3-2.2 6.7-3 11-1.4v-17Z" /><path d="M9 12c2-.5 3.6-.3 5 .4M9 16c2-.5 3.6-.3 5 .4m9-4.4c-2-.5-3.6-.3-5 .4m5 3.6c-2-.5-3.6-.3-5 .4" /></svg></span>
+          <span class="brand-copy"><strong>читальня</strong><span>библиотека рядом</span></span>
+        </a>
+        <span class="auth-badge"><i></i> Локальная база SQLite</span>
+        <h1 id="authTitle">Вход администратора</h1>
+        <p class="auth-description" id="authDescription">Войдите, чтобы управлять каталогом и читателями.</p>
+        <p class="auth-error hidden" id="authError" role="alert"></p>
+        <form id="loginForm" class="auth-form">
+          <label>Логин<input name="username" required autocomplete="username" minlength="3" maxlength="32" placeholder="Логин администратора" /></label>
+          <label>Пароль<input name="password" required type="password" autocomplete="current-password" placeholder="Ваш пароль" /></label>
+          <button class="button button-primary auth-submit" type="submit">Войти в библиотеку <span>→</span></button>
+        </form>
+        <form id="setupForm" class="auth-form hidden">
+          <label>Логин администратора<input name="username" required autocomplete="username" minlength="3" maxlength="32" pattern="[A-Za-z0-9_.]{3,32}" placeholder="Например, admin" /></label>
+          <label>Новый пароль<input name="password" required type="password" autocomplete="new-password" minlength="10" maxlength="256" placeholder="Не менее 10 символов" /></label>
+          <label>Повторите пароль<input name="confirmPassword" required type="password" autocomplete="new-password" minlength="10" maxlength="256" placeholder="Введите пароль ещё раз" /></label>
+          <button class="button button-primary auth-submit" type="submit">Создать администратора <span>→</span></button>
+        </form>
+        <p class="auth-footnote">Доступна только на этом компьютере · данные не отправляются в интернет</p>
+      </section>
+    </div>
+  </body>
+</html>
